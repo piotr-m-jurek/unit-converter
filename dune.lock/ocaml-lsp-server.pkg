@@ -1,0 +1,41 @@
+(version 1.21.0)
+
+(build
+ (progn
+  (when
+   %{pkg-self:dev}
+   (run dune subst))
+  (run dune build -p %{pkg-self:name} -j %{jobs} @install)))
+
+(depends
+ dune
+ yojson
+ base
+ lsp
+ jsonrpc
+ re
+ ppx_yojson_conv_lib
+ dune-rpc
+ chrome-trace
+ dyn
+ stdune
+ fiber
+ ocaml
+ xdg
+ ordering
+ dune-build-info
+ spawn
+ astring
+ camlp-streams
+ ocamlc-loc
+ pp
+ csexp
+ ocamlformat-rpc-lib
+ merlin-lib)
+
+(source
+ (fetch
+  (url
+   https://github.com/ocaml/ocaml-lsp/releases/download/1.21.0/lsp-1.21.0.tbz)
+  (checksum
+   sha256=67870337ff23d0d2ba43774bfb58a8fde04977ea37da4d2dc500ed0b57cef717)))

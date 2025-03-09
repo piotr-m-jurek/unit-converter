@@ -1,0 +1,6 @@
+(executable
+ (public_name unit_converter)
+ (name main)
+ (libraries dream core lwt_ppx html_of_jsx)
+ (preprocess
+  (pps html_of_jsx.ppx lwt_ppx)))
