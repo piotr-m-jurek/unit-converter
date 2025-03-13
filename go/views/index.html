@@ -1,0 +1,25 @@
+{{ block "index" . }}
+<html>
+
+<head>
+    <title>Our First HTML Site!</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
+</head>
+
+<body>
+    <div id="count">
+        {{template "count" .}}
+    </div>
+    <button hx-post="/count" hx-target="#count">Increment</button>
+</body>
+
+</html>
+
+{{ end }}
+
+
+{{ block "count" . }}
+Count {{ .Count }}
+{{ end}}
