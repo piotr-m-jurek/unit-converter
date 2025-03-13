@@ -1,0 +1,17 @@
+(version 0.2.0)
+
+(build
+ (progn
+  (when
+   %{pkg-self:dev}
+   (run dune subst))
+  (run dune build -p %{pkg-self:name} -j %{jobs} @install)))
+
+(depends dune ocaml dream lambdasoup markup lwt_ppx)
+
+(source
+ (fetch
+  (url
+   https://github.com/tmattio/dream-livereload/releases/download/0.2.0/dream-livereload-0.2.0.tbz)
+  (checksum
+   sha256=f9650347225b2e42b2e45419f4b98435c432c0a295b25fd7e1a7dc219024f8de)))

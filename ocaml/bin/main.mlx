@@ -1,0 +1,116 @@
+let form_element ~request () =
+  let submit_button  () = JSX.node "button" ["hx-post", `String "/"; "hx-target", `String "body"] [JSX.string "Submit"] in
+    <form>
+      (JSX.unsafe @@  Dream.csrf_tag request)
+      <input type_="text" name="name" />
+      <submit_button />
+    </form>
+;;
+
+let wrapper ~children () = 
+  <html>
+    <head>
+      <title>"Yo! listen"</title>
+      <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+      <style>
+        {|
+          .tabs { display: flex; gap: 1rem; margin-bottom: 1rem; }
+          .tabs button { padding: 0.5rem 1rem; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
+          .tabs button.active { background: #007bff; color: white; border-color: #0056b3; }
+        |}
+      </style>
+    </head>
+    <body>children</body>
+  </html>
+;;
+
+let greet ~who ~request () =
+  <div id="greeting">
+    <h1>(JSX.string ("Hello " ^ who ^  "!"))</h1>
+    <form_element request />
+  </div>
+;;
+
+let render_get_root request = 
+  Dream.html @@ JSX.render
+    <wrapper>
+      <greet who="world" request />
+    </wrapper>
+;;
+
+let render_expired =
+  Dream.html @@ JSX.render
+    <div>"Expired"</div>
+;;
+
+let render_not_ok =
+  Dream.html @@ JSX.render
+    <div>"Not Ok"</div>
+;;
+
+let render_post_root request = 
+  let happy_path ~value = 
+    Dream.html @@ JSX.render
+        <wrapper>
+          <greet who=value request />
+        </wrapper>
+  in
+  let%lwt form_data = Dream.form request in
+  match form_data with
+  | `Ok data -> 
+    let _, value = data |> List.find (fun ( a, _ ) -> String.equal a "name")  in
+    let _ = Dream.log "\n\n value %s" value in
+    happy_path ~value 
+  | `Expired _ -> render_expired
+  | _ -> render_not_ok
+;;
+module Tabs = struct
+  type t = Length | Weight | Temperature
+
+  let to_string = function
+    | Length -> "length"
+    | Weight -> "weight"
+    | Temperature -> "temperature"
+  ;;
+
+  let of_string = function 
+    | "length" -> Length
+    | "weight" -> Weight
+    |"temperature" -> Temperature
+    |_ -> Length
+  ;;
+
+end
+
+let render_get_form request = 
+  let selected_tab = (
+    match Dream.query request "tab" with
+    | None -> Tabs.Length
+    | Some v -> Tabs.of_string v 
+  ) in
+  Dream.log "selected tab: %s" @@ Tabs.to_string selected_tab;
+  Dream.html @@ JSX.render 
+    <div class_="flex">
+        <div class_="tabs">
+          ([Length; Weight; Temperature] |> List.map (fun tab ->
+            let tab_str = Tabs.to_string tab in
+            JSX.node "button" 
+              [ "hx-get", `String ("/form?tab=" ^ tab_str)
+              ; "hx-push-url", `String "true"
+              ; "hx-target", `String "body"
+              ; "class_", `String (if tab = selected_tab then "active" else "")
+              ] 
+              [JSX.string (String.capitalize_ascii tab_str)]
+          ) |> JSX.list)
+        </div>
+    </div>
+
+let () =
+  Dream.run
+  @@ Dream.logger
+  @@ Dream.memory_sessions
+  @@ Dream.router
+    [ Dream.get "/" render_get_root 
+    ; Dream.post "/" render_post_root
+    ; Dream.get "/form" render_get_form
+    ]

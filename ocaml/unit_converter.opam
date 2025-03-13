@@ -21,6 +21,7 @@ depends: [
   "ocamlmerlin-mlx"
   "ocamlformat-mlx"
   "html_of_jsx"
+  "dream-livereload"
   "odoc" {with-doc}
 ]
 build: [
