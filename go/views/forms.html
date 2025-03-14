@@ -1,0 +1,135 @@
+{{ block "unit-converter" . }}
+<html>
+<head>
+    <title>Our First HTML Site!</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="stylesheet" href="/static/tiny-brutalism.css" />
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+
+</head>
+<body>
+<div class="box">
+    <h1>Unit converter</h1>
+    {{template "tabs" . }}
+    <br />
+    {{ template "form" .}}
+</div>
+
+</body>
+</html>
+{{end}}
+
+{{ block "tabs" .}}
+    <div id="tabs" style="display: flex; gap: 1rem;">
+        <button
+            hx-target="#tabs"
+            hx-get="/form/length"
+            hx-push-url="true"
+            {{ if .IsTabSelected "length" }} class="alert-info" {{end}}
+        >Length</button>
+        <button
+            hx-target="#tabs"
+            hx-get="/form/weight"
+            hx-push-url="true"
+            {{ if .IsTabSelected "weight" }} class="alert-info" {{end}}
+        >Weight</button>
+        <button
+            hx-target="#tabs"
+            hx-get="/form/temperature"
+            hx-push-url="true"
+            {{ if .IsTabSelected "temperature" }} class="alert-info" {{end}}
+        >Temperature</button>
+    </div>
+{{end }}
+
+{{ block "length" .}}
+<form>
+    <label>
+        Enter the length to convert
+        <input type="number" name="length" />
+    </label>
+
+    <label>
+        Unit to convert from
+        <input type="number" name="unit-from" />
+    </label>
+
+    <label>
+        Unit to convert to
+        <input type="number" name="unit-to" />
+    </label>
+</form>
+{{ end }}
+
+{{ block "weight" .}}
+<form>
+    <label>
+        Enter the weight to convert
+        <input type="number" name="weight" />
+    </label>
+
+    <label>
+        Unit to convert from
+        <input type="number" name="unit-from" />
+    </label>
+
+    <label>
+        Unit to convert to
+        <input type="number" name="unit-to" />
+    </label>
+</form>
+{{ end }}
+
+{{ block "temperature" .}}
+<form>
+    <label>
+        Enter the temperature to convert
+        <input type="number" name="temperature" />
+    </label>
+
+    <label>
+        Unit to convert from
+        <input type="number" name="unit-from" />
+    </label>
+
+    <label>
+        Unit to convert to
+        <input type="number" name="unit-to" />
+    </label>
+</form>
+{{ end }}
+
+{{ block "form" .}}
+<div id="tab-content">
+{{if .IsTabSelected "length"}}
+    {{ template "length" .}}
+{{end}}
+
+{{if .IsTabSelected "weight"}}
+    {{ template "weight" .}}
+{{end}}
+
+{{if .IsTabSelected "temperature"}}
+    {{ template "temperature" .}}
+{{end}}
+
+</div>
+{{end}}
+
+{{ block "oob-form" .}}
+<div hx-swap-oob="outerHTML" id="tab-content">
+
+{{if .IsTabSelected "length"}}
+    {{ template "length" .}}
+{{end}}
+
+{{if .IsTabSelected "weight"}}
+    {{ template "weight" .}}
+{{end}}
+
+{{if .IsTabSelected "temperature"}}
+    {{ template "temperature" .}}
+{{end}}
+</div>
+
+{{end}}
